@@ -21,7 +21,7 @@ class _PageNavigatorState extends State<PageNavigator> {
     Track4RunPage(),
     FeedPage(),
     AutomatedSOSPage(),
-    SettingsPage()
+    SettingPage(),
   ];
 
   @override
