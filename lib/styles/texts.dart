@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'colors.dart';
 
+
+//this map implement text styles used inside the application
+
 Map<String, TextStyle> textStyles = {
   'title_text': new TextStyle(
     fontSize: 28.0,
