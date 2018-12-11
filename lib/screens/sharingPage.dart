@@ -1,73 +1,95 @@
 import 'package:flutter/material.dart';
-import 'package:track_me/styles/texts.dart';
 import 'package:track_me/styles/colors.dart';
+import 'package:track_me/styles/texts.dart';
 
-final items = List<companyTileAccepted>.generate(6, (i) => companyTileAccepted('Name ${i + 1}', 'Type', 'date'));
+//testing lists
+final activeRequestList = List<companyTileAccepted>.generate(
+    6, (i) => companyTileAccepted('Name ${i + 1}', 'Type', 'date'));
 
-class SharingPage extends StatefulWidget {
-  static String tag = 'sharing-page';
-  @override
-  _SharingPageState createState() => new _SharingPageState();
-}
+final pendingRequestList = List<companyTileRequest>.generate(
+    6, (i) => companyTileRequest('Name ${i + 1}', 'Type'));
 
-class _SharingPageState extends State<SharingPage> {
+class companyTileAccepted extends StatelessWidget {
+  String companyName;
+  Image companyImage; //TODO how does server send images ?
+  String companyType;
+  String sharingSince;
+
+  companyTileAccepted(
+      String companyName, String companyType, String sharingSince) {
+    this.companyName = companyName;
+    this.companyType = companyType;
+    this.sharingSince = sharingSince;
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ListView(
-            children: <Widget>[
-              new Text('Pending requests', style: textStyles['title_text']),
-              SizedBox(height: 32.0,),
-              new ListView(
-                physics: ClampingScrollPhysics(),
-                shrinkWrap: true,
-                children: <Widget>[
-                  new companyTileRequest('Adidas', 'Sportwear'),
-                  new companyTileRequest('Nike', 'Sportwear')
-                ],
-              ),
-              SizedBox(height: 32.0),
-              new Text('Active requests', style: textStyles['title_text'],),
-              SizedBox(height: 32.0,),
-              ListView.builder(
-                physics: ClampingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  return Dismissible(
-                    // Show a red background as the item is swiped away
-                    background: Container(color: Colors.transparent),
-                    key: Key(item.companyName),
-                    onDismissed: (direction) {
+    assert(debugCheckHasMaterial(context));
+    return Material(
+      child: Padding(
+        padding:
+            const EdgeInsets.only(left: 0.0, right: 0.0, top: 8.0, bottom: 0.0),
+        child: Container(
+          child: Center(
+            child: Card(
+                child: Row(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.blue,
+                    radius: 36,
+                    child: Image.asset('assets/icons/logo.png'),
+                  ),
+                ),
+                new Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      new Text(
+                        companyName,
+                        style: new TextStyle(
+                          fontFamily: 'Roboto',
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      new Text(
+                        companyType,
+                        style: new TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Roboto',
+                          fontSize: 14.0,
+                        ),
+                      ),
+                      new Text(
+                        'since: ' + sharingSince,
+                        style: new TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'Roboto',
+                          fontSize: 14.0,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
 
-                      setState(() {
-                        item.refuse();  //this function modify the database
-                        items.removeAt(index);
-                      });
-
-                      Scaffold
-                          .of(context)
-                          .showSnackBar(SnackBar(content: Text("${item.companyName} request dismissed")));
-                    },
-                    child:  items[index]
-                  );
-                }
-              )
-            ],
+              ],
+            )),
           ),
         ),
-      )
+      ),
     );
+  }
+
+  refuse() {
+    print('refused!');
   }
 }
 
-
-//a widget that display a sharing request tile to the user
 class companyTileRequest extends StatelessWidget {
   String companyName;
   Image companyImage; //TODO how does server send images ?
@@ -78,13 +100,17 @@ class companyTileRequest extends StatelessWidget {
     this.companyType = companyType;
   }
 
+  accept() {
+    print('accepted!');
+  }
+
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterial(context));
     return Material(
       child: Padding(
-        padding: const EdgeInsets.only(
-            left: 0.0, right: 0.0, top: 8.0, bottom: 0.0),
+        padding:
+            const EdgeInsets.only(left: 0.0, right: 0.0, top: 8.0, bottom: 0.0),
         child: Container(
           child: Center(
             child: Card(
@@ -124,19 +150,6 @@ class companyTileRequest extends StatelessWidget {
                     ],
                   ),
                 ),
-                new IconButton(
-                    icon: Icon(Icons.check),
-                    highlightColor: colorStyles['primary_pink'],
-                    splashColor: colorStyles['splashColor_pink'],
-                    onPressed: accept),//TODO implement those methods
-                Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: new IconButton(
-                      icon: Icon(Icons.clear),
-                      highlightColor: colorStyles['primary_pink'],
-                      splashColor: colorStyles['splashColor_pink'],
-                      onPressed: refuse),
-                )
 
               ],
             )),
@@ -145,101 +158,159 @@ class companyTileRequest extends StatelessWidget {
       ),
     );
   }
-  accept() {
-    print('accepted!');
-  }
 
-  refuse(){
+  refuse() {
     print('refused!');
   }
-
 }
 
-class companyTileAccepted extends StatelessWidget {
-  String companyName;
-  Image companyImage; //TODO how does server send images ?
-  String companyType;
-  String sharingSince;
+//a widget that display a sharing request tile to the user
+class SharingPage extends StatefulWidget {
+  static String tag = 'sharing-page';
+  @override
+  _SharingPageState createState() => new _SharingPageState();
+}
 
-  companyTileAccepted(String companyName, String companyType, String sharingSince) {
-    this.companyName = companyName;
-    this.companyType = companyType;
-    this.sharingSince = sharingSince;
-  }
+class _SharingPageState extends State<SharingPage> {
   @override
   Widget build(BuildContext context) {
-    assert(debugCheckHasMaterial(context));
-    return Material(
+    return Scaffold(
+        body: Container(
       child: Padding(
-        padding: const EdgeInsets.only(
-            left: 0.0, right: 0.0, top: 8.0, bottom: 0.0),
-        child: Container(
-          child: Center(
-            child: Card(
-                child: Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CircleAvatar(
-                        backgroundColor: Colors.blue,
-                        radius: 36,
-                        child: Image.asset('assets/icons/logo.png'),
+        padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          children: <Widget>[
+            new Text('Pending requests', style: textStyles['title_text']),
+            SizedBox(
+              height: 32.0,
+            ),
+            ListView.builder(
+                physics: ClampingScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: pendingRequestList.length,
+                itemBuilder: (context, index) {
+                  final item = pendingRequestList[index];
+                  return Dismissible(
+                      // Show a red background as the item is swiped away
+                      secondaryBackground: Padding(
+                        padding: EdgeInsets.only(top: 15, bottom: 5),
+                        child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.all(16.0),
+                            color: Colors.greenAccent,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.transparent,
+                                    radius: 16,
+                                    child: Image.asset('assets/icons/check.png'),
+                                  ),
+                                )
+                              ],
+                            )),
                       ),
-                    ),
-                    new Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          new Text(
-                            companyName,
-                            style: new TextStyle(
-                              fontFamily: 'Roboto',
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                          new Text(
-                            companyType,
-                            style: new TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Roboto',
-                              fontSize: 14.0,
-                            ),
-                          ),
-                          new Text(
-                            'since: ' + sharingSince,
-                            style: new TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Roboto',
-                              fontSize: 14.0,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: new IconButton(
-                          icon: Icon(Icons.clear),
-                          highlightColor: colorStyles['primary_pink'],
-                          splashColor: colorStyles['splashColor_pink'],
-                          onPressed: refuse
-                      ),
-                    )
 
-                  ],
-                )),
-          ),
+                      background: Padding(
+                        padding: EdgeInsets.only(top: 15, bottom: 5),
+                        child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.all(16.0),
+                            color: Color.fromRGBO(243, 20, 49, 0.5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.transparent,
+                                    radius: 16,
+                                    child: Image.asset('assets/icons/cross.png'),
+                                  ),
+                                )
+                              ],
+                            )),
+
+                      ),
+                      key: Key(item.companyName),
+
+                      onDismissed: (direction) {
+                        setState(() {
+                          if(direction == DismissDirection.endToStart) {
+
+                          }
+                          //delete request
+                          item.refuse(); //this function modify the database
+                          pendingRequestList.removeAt(index);
+                          activeRequestList.add(new companyTileAccepted(
+                              'Nike', item.companyType, 'now'));
+                        });
+
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                            content:
+                                Text("${item.companyName} request dismissed")));
+                      },
+                      child: pendingRequestList[index]);
+                }),
+            SizedBox(height: 32.0),
+            new Text(
+              'Active requests',
+              style: textStyles['title_text'],
+            ),
+            SizedBox(
+              height: 32.0,
+            ),
+            ListView.builder(
+                physics: ClampingScrollPhysics(),
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: activeRequestList.length,
+                itemBuilder: (context, index) {
+                  final item = activeRequestList[index];
+                  return Dismissible(
+                      // Show a red background as the item is swiped away
+                      background: Padding(
+                        padding: EdgeInsets.only(top: 15, bottom: 5),
+                        child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.all(16.0),
+                            color: Color.fromRGBO(243, 20, 49, 0.5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.transparent,
+                                    radius: 16,
+                                    child: Image.asset('assets/icons/cross.png'),
+                                  ),
+                                )
+                              ],
+                            )),
+
+                      ),
+                      key: Key(item.companyName),
+                      direction: DismissDirection.startToEnd,
+                      onDismissed: (direction) {
+                        setState(() {
+                          //delete request
+                          item.refuse(); //this function modify the database
+                          activeRequestList.removeAt(index);
+                        });
+
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                            content:
+                                Text("${item.companyName} request dismissed")));
+                      },
+                      child: activeRequestList[index]);
+                })
+          ],
         ),
       ),
-    );
-  }
-
-  refuse(){
-    print('refused!');
+    ));
   }
 }
